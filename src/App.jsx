@@ -39,7 +39,8 @@ const publications = [
     image: "/assets/Research/enhancing stock.jpg",
   },
   {
-    title: "A Real-Time Chart Explanation System for Visually Impaired Individuals",
+    title:
+      "A Real-Time Chart Explanation System for Visually Impaired Individuals",
     venue: "ICCHP 2024",
     url: "https://link.springer.com/chapter/10.1007/978-3-031-62846-7_37",
     image: "/assets/Research/a realtime.webp",
@@ -87,6 +88,15 @@ const partnerships = [
   },
 ];
 
+const menuLinks = [
+  ["Profile", "https://sites.google.com/view/yoojeong/profile"],
+  ["Publication", "https://sites.google.com/view/yoojeong/publication"],
+  ["Research", "https://sites.google.com/view/yoojeong/research"],
+  ["Lecture", "https://sites.google.com/view/yoojeong/lecture"],
+  ["Members", "https://sites.google.com/view/yoojeong/members"],
+  ["Events", "https://sites.google.com/view/yoojeong/events"],
+];
+
 function Arrow() {
   return (
     <span className="arrow" aria-hidden="true">
@@ -132,17 +142,66 @@ function useSmoothScroll() {
 }
 
 function Header({ compact }) {
-  return (
-    <header className={`site-header ${compact ? "site-header--compact" : ""}`}>
-      <a className="brand" href="#top" aria-label="AICS home">
-        AICS®
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="#work">research</a>
-        <a href="#studio">about</a>
-        <a href="#playground">location</a>
-      </nav>
+  const [menuOpen, setMenuOpen] = useState(false);
 
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
+
+  return (
+    <header
+      className={`site-header ${compact ? "site-header--compact" : ""} ${menuOpen ? "site-header--open" : ""}`}
+    >
+      <div className="site-header-bar">
+        <a className="brand" href="#top" aria-label="AICS home">
+          AICS®
+        </a>
+        <nav className="top-navigation" aria-label="Primary navigation">
+          <a href="#work">research</a>
+          <a href="#studio">key research</a>
+          <a href="#playground">location</a>
+        </nav>
+        <button
+          className="menu-toggle"
+          type="button"
+          aria-expanded={menuOpen}
+          aria-controls="site-menu-panel"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+      </div>
+
+      <div
+        className="site-menu-panel"
+        id="site-menu-panel"
+        aria-hidden={!menuOpen}
+      >
+        <nav className="site-menu-links" aria-label="External pages">
+          {menuLinks.map(([label, href]) => (
+            <a
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              tabIndex={menuOpen ? undefined : -1}
+              onClick={() => setMenuOpen(false)}
+              key={label}
+            >
+              <span>{label}</span>
+            </a>
+          ))}
+        </nav>
+      </div>
     </header>
   );
 }
@@ -151,8 +210,16 @@ function Hero() {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const playShowreel = () => {
-    videoRef.current?.play().catch(() => {});
+  const toggleShowreel = () => {
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    if (video.paused) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
   };
 
   return (
@@ -162,7 +229,10 @@ function Hero() {
           AICS
         </div>
       </div>
-      <div className={`hero-media ${isPlaying ? "is-playing" : ""}`}>
+      <div
+        className={`hero-media ${isPlaying ? "is-playing" : ""}`}
+        onClick={isPlaying ? toggleShowreel : undefined}
+      >
         <video
           ref={videoRef}
           muted
@@ -171,6 +241,7 @@ function Hero() {
           preload="metadata"
           poster="/assets/a-poster.jpg"
           onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
         >
           <source src={videoSource} type="video/mp4" />
         </video>
@@ -178,16 +249,10 @@ function Hero() {
         <button
           className="showreel-trigger"
           type="button"
-          onClick={playShowreel}
-          aria-label="Play showreel"
+          onClick={toggleShowreel}
+          aria-label={isPlaying ? "Pause showreel" : "Play showreel"}
         >
-          <span className="showreel-play" aria-hidden="true">
-            ▶
-          </span>
-          <span className="showreel-copy">
-            <strong>Watch Showreel</strong>
-            <small>2015–26</small>
-          </span>
+          <span className="showreel-play" aria-hidden="true" />
         </button>
       </div>
       <div className="hero-entry" aria-hidden="true">
@@ -317,6 +382,18 @@ function Footer() {
   return (
     <footer className="footer section-pad">
       <div className="footer-brand-panel">
+        <nav className="footer-page-links" aria-label="External pages">
+          {menuLinks.map(([label, href]) => (
+            <a
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              key={label}
+            >
+              <span>{label}</span>
+            </a>
+          ))}
+        </nav>
         <div className="footer-logo">AICS®</div>
       </div>
       <div className="footer-partnerships">
@@ -350,10 +427,17 @@ function Footer() {
         </div>
         <div className="footer-email">
           <a href="mailto:yoojeong@sch.ac.kr">yoojeong@sch.ac.kr</a>
+          <div className="footer-legal">
+            <p>© 2026 AICS Lab. All rights reserved.</p>
+            <p>Soonchunhyang University</p>
+          </div>
           <div className="footer-bottom-marks">
-            <img src="/assets/Logo/aics-favicon.png" alt="AICS symbol" />
             <img
-              src="/assets/Logo/sch_Logo.png"
+              src="/assets/Logo/AI%20CS%20LAB%20%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9%20-%20%E1%84%80%E1%85%A1%E1%84%85%E1%85%A9%E1%84%92%E1%85%A7%E1%86%BC%20%E1%84%80%E1%85%A5%E1%86%B7%E1%84%8B%E1%85%B3%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF%E1%84%8A%E1%85%B5%20%E1%84%87%E1%85%A2%E1%84%80%E1%85%A7%E1%86%BC%E1%84%8C%E1%85%A6%E1%84%80%E1%85%A5.png"
+              alt="AICS Lab"
+            />
+            <img
+              src="/assets/Logo/sch_Logo1.svg"
               alt="Soonchunhyang University"
             />
           </div>
