@@ -1,1 +1,1 @@
-<img src="./public/assets/Screenshot.png">
+![Screenshot](public/assets/Screenshot.png)
