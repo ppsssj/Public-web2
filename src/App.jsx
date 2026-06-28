@@ -7,20 +7,56 @@ const projects = [
   {
     name: "Financial Time-Series Analysis & Prediction",
     field: "Finance AI",
-    role: "Forecasting · Trend Analysis · Volatility Modeling",
+    role: "Financial data modeling & prediction",
     awards: "Forecasting  ·  Trend Analysis  ·  Volatility Modeling",
+    image:
+      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=900&q=85",
   },
   {
     name: "Visual Information Processing & AI Applications",
     field: "Vision AI",
     role: "Visual data processing with AI",
     awards: "Computer Vision · Image Processing · Object Detection",
+    image:
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=85",
   },
   {
     name: "Accessibility & Explainable",
     field: "XAI",
     role: "Human-centered and trustworthy AI",
     awards: "XAI · Interpretability · Inclusive Design",
+    image:
+      "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=900&q=85",
+  },
+];
+
+const publications = [
+  {
+    title:
+      "Enhancing Stock Market Trend Reversal Prediction using Feature-enriched Neural Networks",
+    venue: "Heliyon",
+    url: "https://www.cell.com/heliyon/fulltext/S2405-8440%2824%2900167-1",
+    image: "/assets/Research/enhancing stock.jpg",
+  },
+  {
+    title: "A Real-Time Chart Explanation System for Visually Impaired Individuals",
+    venue: "ICCHP 2024",
+    url: "https://link.springer.com/chapter/10.1007/978-3-031-62846-7_37",
+    image: "/assets/Research/a realtime.webp",
+  },
+  {
+    title:
+      "Implementing and Evaluating a Font Recommendation System Through Emotion-Based Content-Font Mapping",
+    venue: "Applied Sciences",
+    url: "https://www.mdpi.com/2076-3417/14/3/1123",
+    image: "/assets/Research/Implementing and.jpg",
+  },
+  {
+    title:
+      "SymbolNet: Bridging Latent Neural Representations and Symbolic Reasoning via Intermediate Feature Interpretating",
+    venue: "IEEE Access",
+    url: "https://ieeexplore.ieee.org/abstract/document/10980088/",
+    image: "/assets/Research/symbolnet.jpg",
   },
 ];
 
@@ -86,155 +122,6 @@ function Header({ onContact }) {
   );
 }
 
-function PixelSplitTitle({ children }) {
-  const titleRef = useRef(null);
-  const tileRefs = useRef([]);
-  const frameRef = useRef(null);
-  const runningRef = useRef(false);
-  const trailRef = useRef([]);
-  const sizeRef = useRef({ width: 1, height: 1 });
-  const lastPointer = useRef({ x: 0, y: 0, active: false });
-  const columns = 20;
-  const rows = 10;
-  const tileCount = columns * rows;
-  const particles = useRef(
-    Array.from({ length: tileCount }, () => ({ x: 0, y: 0, vx: 0, vy: 0 })),
-  );
-
-  useEffect(
-    () => () => {
-      cancelAnimationFrame(frameRef.current);
-    },
-    [],
-  );
-
-  const animateTiles = () => {
-    const title = titleRef.current;
-    if (!title) return;
-    const now = performance.now();
-    trailRef.current = trailRef.current.filter(
-      (point) => now - point.time < 560,
-    );
-    const { width, height } = sizeRef.current;
-    const radius = Math.min(105, height * 0.27);
-    let movement = 0;
-
-    particles.current.forEach((particle, index) => {
-      const column = index % columns;
-      const row = Math.floor(index / columns);
-      const tileX = ((column + 0.5) / columns) * width;
-      const tileY = ((row + 0.5) / rows) * height;
-
-      trailRef.current.forEach((point) => {
-        const dx = tileX - point.x * width;
-        const dy = tileY - point.y * height;
-        const distance = Math.hypot(dx, dy);
-        if (distance >= radius) return;
-
-        const age = Math.max(0, 1 - (now - point.time) / 560);
-        const force = (1 - distance / radius) ** 2 * age;
-        const safeDistance = Math.max(1, distance);
-        const radialX = dx / safeDistance;
-        const radialY = dy / safeDistance;
-        const tangentX = -radialY;
-        const tangentY = radialX;
-        const spin = Math.sign(point.dx * dy - point.dy * dx) || 1;
-
-        particle.vx +=
-          (point.dx * 0.06 + radialX * 0.4 + tangentX * spin * 0.42) * force;
-        particle.vy +=
-          (point.dy * 0.06 + radialY * 0.4 + tangentY * spin * 0.42) * force;
-      });
-
-      particle.vx += -particle.x * 0.11;
-      particle.vy += -particle.y * 0.11;
-      particle.vx *= 0.72;
-      particle.vy *= 0.72;
-      particle.x = Math.max(-12, Math.min(12, particle.x + particle.vx));
-      particle.y = Math.max(-9, Math.min(9, particle.y + particle.vy));
-      movement = Math.max(movement, Math.abs(particle.x), Math.abs(particle.y));
-
-      const tile = tileRefs.current[index];
-      if (tile)
-        tile.style.transform = `translate3d(${particle.x.toFixed(2)}px, ${particle.y.toFixed(2)}px, 0)`;
-    });
-
-    if (trailRef.current.length || movement > 0.08) {
-      frameRef.current = requestAnimationFrame(animateTiles);
-    } else {
-      runningRef.current = false;
-      title.classList.remove("is-splitting");
-    }
-  };
-
-  const distortAtPointer = (event) => {
-    const title = titleRef.current;
-    if (!title) return;
-
-    const rect = title.getBoundingClientRect();
-    sizeRef.current = { width: rect.width, height: rect.height };
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = (event.clientY - rect.top) / rect.height;
-    const previous = lastPointer.current;
-    const dx = previous.active
-      ? Math.max(-24, Math.min(24, event.clientX - previous.x))
-      : 0;
-    const dy = previous.active
-      ? Math.max(-24, Math.min(24, event.clientY - previous.y))
-      : 0;
-    lastPointer.current = { x: event.clientX, y: event.clientY, active: true };
-
-    trailRef.current.push({ x, y, dx, dy, time: performance.now() });
-    if (trailRef.current.length > 30) trailRef.current.shift();
-    title.classList.add("is-splitting");
-
-    if (!runningRef.current) {
-      runningRef.current = true;
-      frameRef.current = requestAnimationFrame(animateTiles);
-    }
-  };
-
-  const releasePointer = () => {
-    lastPointer.current.active = false;
-  };
-
-  return (
-    <div
-      ref={titleRef}
-      className="hero-word pixel-title"
-      onPointerMove={distortAtPointer}
-      onPointerLeave={releasePointer}
-      aria-hidden="true"
-    >
-      <span className="pixel-title-base">{children}</span>
-      <span className="pixel-title-layers">
-        {Array.from({ length: tileCount }, (_, index) => {
-          const column = index % columns;
-          const row = Math.floor(index / columns);
-          const top = (row / rows) * 100;
-          const right = 100 - ((column + 1) / columns) * 100;
-          const bottom = 100 - ((row + 1) / rows) * 100;
-          const left = (column / columns) * 100;
-          return (
-            <span
-              ref={(element) => {
-                tileRefs.current[index] = element;
-              }}
-              className="pixel-title-tile"
-              style={{
-                clipPath: `inset(${top}% ${right}% ${bottom}% ${left}%)`,
-              }}
-              key={index}
-            >
-              {children}
-            </span>
-          );
-        })}
-      </span>
-    </div>
-  );
-}
-
 function Hero() {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -246,7 +133,9 @@ function Hero() {
   return (
     <section className="hero hero--playing" id="top">
       <div className="hero-copy">
-        <PixelSplitTitle>AICS</PixelSplitTitle>
+        <div className="hero-word" aria-hidden="true">
+          AICS
+        </div>
       </div>
       <div className={`hero-media ${isPlaying ? "is-playing" : ""}`}>
         <video
@@ -301,13 +190,20 @@ function Work() {
             <span className="project-number">
               {String(index + 1).padStart(2, "0")}
             </span>
-            <div className="project-meta">
-              <span>{project.role}</span>
+            <div className="project-summary">
+              <h3>{project.name}</h3>
               <span>{project.awards}</span>
             </div>
-            <div className="project-title">
-              <h3>{project.name}</h3>
-              <span>{project.field}</span>
+            <div className="project-field">
+              <strong>{project.field}</strong>
+              <span>{project.role}</span>
+            </div>
+            <div className="project-thumb">
+              <img
+                src={project.image}
+                alt={`${project.field} research`}
+                loading="lazy"
+              />
             </div>
           </article>
         ))}
@@ -329,55 +225,64 @@ function Studio() {
           that are useful, transparent, and human-centered.
         </p>{" "}
       </div>
-      <div className="studio-grid" data-reveal>
-        <div className="studio-art" aria-hidden="true">
-          <span>Z</span>
-          <span>26</span>
-        </div>
-        <div className="fact">
-          <h3>Services:</h3>
-          <ul>
-            <li>Web Design</li>
-            <li>Web Development</li>
-            <li>Mobile Apps</li>
-            <li>Branding</li>
-            <li>Motion Graphics</li>
-            <li>3D Illustration</li>
-            <li>Sound Design</li>
-            <li>Webflow</li>
-          </ul>
-        </div>
-        <div className="fact">
-          <h3>Stats:</h3>
-          <ul>
-            <li>Founded 2015</li>
-            <li>Clients 300+</li>
-            <li>Countries 12</li>
-            <li>Awwwards 62</li>
-            <li>Team 28</li>
-          </ul>
-        </div>
+      <div className="publication-grid" data-reveal>
+        {publications.map((publication, index) => (
+          <article className="publication-card" key={publication.title}>
+            <span className="publication-number">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <div className="publication-image">
+              <img src={publication.image} alt="" loading="lazy" />
+            </div>
+            <div className="publication-content">
+              <span className="publication-venue">{publication.venue}</span>
+              <h3>{publication.title}</h3>
+              <a
+                href={publication.url}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${publication.title} full text`}
+              >
+                Full text <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );
 }
 
 function Playground() {
+  const address = "충남 아산시 순천향로 22-11 멀티미디어 5층 507호";
+  const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
+  const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+
   return (
     <section className="playground section-pad" id="playground">
       <div className="section-intro playground-intro" data-reveal>
-        <h2>AICS</h2>
         <h2>
           Location
           <Arrow />
         </h2>
-        <p>
-          We dare to be different: to experiment, innovate, bring things into
-          being, and spark emotions. Join us in creating something truly unique.
-        </p>
       </div>
-      <div className="z15" aria-hidden="true">
-        Z15<sup>™</sup>
+
+      <div className="location-card" data-reveal>
+        <div className="location-map">
+          <iframe
+            title="AICS 연구실 위치 지도"
+            src={mapUrl}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+        <div className="location-info">
+          <span className="location-label">ADDRESS</span>
+          <address>{address}</address>
+          <a href={mapLink} target="_blank" rel="noreferrer">
+            View on Google Maps <Arrow />
+          </a>
+        </div>
       </div>
     </section>
   );
