@@ -60,6 +60,33 @@ const publications = [
   },
 ];
 
+const partnerships = [
+  {
+    name: "Computer Vision and Pattern Recognition Laboratory",
+    label: "CVPR Lab.",
+    url: "https://sites.google.com/view/dong-a-cvpr",
+    image: "/assets/Univ/donga univ.jpg",
+  },
+  {
+    name: "Intelligent Communication, Information and Control Systems (IC2S) Lab.",
+    label: "IC2S Lab.",
+    url: "https://sites.google.com/view/ic2s/home?authuser=0",
+    image: "/assets/Univ/semyung univ.png",
+  },
+  {
+    name: "Smart System Software Lab.",
+    label: "SSS Lab.",
+    url: "https://sites.google.com/view/jwleelab",
+    image: "/assets/Univ/sookmyung univ.png",
+  },
+  {
+    name: "ICT Convergence Research Institute",
+    label: "ICT Convergence Research Institute",
+    url: "https://sites.google.com/view/donga-cvpr/home",
+    image: "/assets/Univ/sookmyung univ.png",
+  },
+];
+
 function Arrow() {
   return (
     <span className="arrow" aria-hidden="true">
@@ -104,20 +131,18 @@ function useSmoothScroll() {
   }, []);
 }
 
-function Header({ onContact }) {
+function Header({ compact }) {
   return (
-    <header className="site-header">
+    <header className={`site-header ${compact ? "site-header--compact" : ""}`}>
       <a className="brand" href="#top" aria-label="AICS home">
         AICS®
       </a>
       <nav aria-label="Primary navigation">
         <a href="#work">research</a>
         <a href="#studio">about</a>
-        <button type="button" onClick={onContact}>
-          contact
-        </button>
+        <a href="#playground">location</a>
       </nav>
-      <span className="location">SCH University</span>
+
     </header>
   );
 }
@@ -288,81 +313,57 @@ function Playground() {
   );
 }
 
-function Contact({ open, onClose }) {
-  useEffect(() => {
-    document.body.classList.toggle("modal-open", open);
-    const closeOnEscape = (event) => event.key === "Escape" && onClose();
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [open, onClose]);
-
-  return (
-    <div
-      className={`contact-modal ${open ? "contact-modal--open" : ""}`}
-      aria-hidden={!open}
-    >
-      <button
-        className="contact-close"
-        type="button"
-        onClick={onClose}
-        aria-label="Close contact form"
-      >
-        ×
-      </button>
-      <div className="contact-inner">
-        <h2>Let’s collaborate!</h2>
-        <form onSubmit={(event) => event.preventDefault()}>
-          <label>
-            <span>01</span> What can we do for you?
-            <select defaultValue="Design">
-              <option>Design</option>
-              <option>Development</option>
-              <option>2D & 3D Art</option>
-              <option>Animation</option>
-            </select>
-          </label>
-          <label>
-            <span>02</span> Your name
-            <input type="text" placeholder="Enter name" />
-          </label>
-          <label>
-            <span>03</span> Your email
-            <input type="email" placeholder="Enter email" />
-          </label>
-          <label>
-            <span>04</span> Project details
-            <textarea placeholder="Tell us about your idea" rows="3" />
-          </label>
-          <button className="submit" type="submit">
-            Send request <Arrow />
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-function Footer({ onContact }) {
+function Footer() {
   return (
     <footer className="footer section-pad">
-      <div className="footer-logo">AICS®</div>
-      <div>
-        <a href="#work">Work</a>
-        <a href="#studio">Studio</a>
-        <button type="button" onClick={onContact}>
-          Contact
-        </button>
-        <small>aics 2026</small>
+      <div className="footer-brand-panel">
+        <div className="footer-logo">AICS®</div>
       </div>
-      <div>
-        <a href="mailto:yoojeong@sch.ac.kr">yoojeong@sch.ac.kr</a>
+      <div className="footer-partnerships">
+        <div className="footer-partnerships-main">
+          <h2>Research Partnerships</h2>
+          <div className="partnership-viewport">
+            <div className="partnership-track">
+              {[0, 1].map((copyIndex) => (
+                <div
+                  className="partnership-group"
+                  aria-hidden={copyIndex === 1}
+                  key={copyIndex}
+                >
+                  {partnerships.map((partnership) => (
+                    <a
+                      className="partnership"
+                      href={partnership.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      tabIndex={copyIndex === 1 ? -1 : undefined}
+                      key={`${copyIndex}-${partnership.name}`}
+                    >
+                      <img src={partnership.image} alt="" loading="lazy" />
+                      <h3>{partnership.name}</h3>
+                    </a>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="footer-email">
+          <a href="mailto:yoojeong@sch.ac.kr">yoojeong@sch.ac.kr</a>
+          <div className="footer-bottom-marks">
+            <img src="/assets/Logo/aics-favicon.png" alt="AICS symbol" />
+            <img
+              src="/assets/Logo/sch_Logo.png"
+              alt="Soonchunhyang University"
+            />
+          </div>
+        </div>
       </div>
     </footer>
   );
 }
 
 export default function App() {
-  const [contactOpen, setContactOpen] = useState(false);
   const [scroll, setScroll] = useState(0);
   useSmoothScroll();
   useReveal();
@@ -383,15 +384,14 @@ export default function App() {
         className="scroll-progress"
         style={{ transform: `scaleX(${scroll})` }}
       />
-      <Header onContact={() => setContactOpen(true)} />
+      <Header compact={scroll > 0.012} />
       <main>
         <Hero />
         <Work />
         <Studio />
         <Playground />
       </main>
-      <Footer onContact={() => setContactOpen(true)} />
-      <Contact open={contactOpen} onClose={() => setContactOpen(false)} />
+      <Footer />
     </>
   );
 }
