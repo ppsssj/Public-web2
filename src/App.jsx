@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Lenis from "lenis";
+import ProfilePage from "./ProfilePage.jsx";
+import PublicationPage from "./PublicationPage.jsx";
+import ResearchPage from "./ResearchPage.jsx";
+import LecturePage from "./LecturePage.jsx";
+import MembersPage from "./MembersPage.jsx";
+import EventsPage from "./EventsPage.jsx";
 
 const videoSource = "/assets/a.mp4";
 
@@ -89,13 +96,51 @@ const partnerships = [
 ];
 
 const menuLinks = [
-  ["Profile", "https://sites.google.com/view/yoojeong/profile"],
-  ["Publication", "https://sites.google.com/view/yoojeong/publication"],
-  ["Research", "https://sites.google.com/view/yoojeong/research"],
-  ["Lecture", "https://sites.google.com/view/yoojeong/lecture"],
-  ["Members", "https://sites.google.com/view/yoojeong/members"],
-  ["Events", "https://sites.google.com/view/yoojeong/events"],
+  { label: "Profile", href: "/profile", internal: true },
+  { label: "Publication", href: "/publication", internal: true },
+  { label: "Research", href: "/research", internal: true },
+  { label: "Lecture", href: "/lecture", internal: true },
+  { label: "Members", href: "/members", internal: true },
+  { label: "Events", href: "/events", internal: true },
 ];
+
+const topNavigationByPath = {
+  "/": [
+    ["research", "work"],
+    ["key research", "studio"],
+    ["location", "playground"],
+  ],
+  "/profile": [
+    ["profile", "profile-overview"],
+    ["career", "profile-history"],
+    ["fields", "profile-focus"],
+  ],
+  "/publication": [
+    ["overview", "publication-overview"],
+    ["recent", "publication-recent"],
+    ["archive", "publication-archive"],
+  ],
+  "/research": [
+    ["overview", "research-overview"],
+    ["areas", "research-areas"],
+    ["projects", "research-projects"],
+  ],
+  "/lecture": [
+    ["overview", "lecture-overview"],
+    ["schedule", "lecture-schedule"],
+    ["courses", "lecture-courses"],
+  ],
+  "/members": [
+    ["current", "current-members"],
+    ["alumni", "members-alumni"],
+    ["theses", "members-theses"],
+  ],
+  "/events": [
+    ["J-K", "event-jk"],
+    ["ICCE", "event-icce"],
+    ["KCC", "event-kcc"],
+  ],
+};
 
 function Arrow() {
   return (
@@ -105,7 +150,7 @@ function Arrow() {
   );
 }
 
-function useReveal() {
+function useReveal(routeKey) {
   useEffect(() => {
     const nodes = document.querySelectorAll("[data-reveal]");
     const observer = new IntersectionObserver(
@@ -118,7 +163,7 @@ function useReveal() {
     );
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, []);
+  }, [routeKey]);
 }
 
 function useSmoothScroll() {
@@ -141,11 +186,13 @@ function useSmoothScroll() {
   }, []);
 }
 
-function Header({ compact }) {
+function Header({ compact, currentPath, onNavigate }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuSettled, setMenuSettled] = useState(false);
   const [menuClosing, setMenuClosing] = useState(false);
   const [menuReturning, setMenuReturning] = useState(false);
+  const isSubpage = currentPath !== "/";
+  const topNavigation = topNavigationByPath[currentPath] || topNavigationByPath["/"];
 
   useEffect(() => {
     if (!menuOpen || menuClosing) {
@@ -198,13 +245,24 @@ function Header({ compact }) {
       className={`site-header ${compact ? "site-header--compact" : ""} ${menuOpen ? "site-header--open" : ""} ${menuSettled ? "site-header--settled" : ""} ${menuClosing ? "site-header--closing" : ""} ${menuReturning ? "site-header--returning" : ""}`}
     >
       <div className="site-header-bar">
-        <a className="brand" href="#top" aria-label="AICS home">
+        <a
+          className="brand"
+          href={isSubpage ? "/" : "#top"}
+          aria-label="AICS home"
+          onClick={(event) => {
+            if (!isSubpage) return;
+            event.preventDefault();
+            onNavigate("/", "Home");
+          }}
+        >
           AICS©
         </a>
-        <nav className="top-navigation" aria-label="Primary navigation">
-          <a href="#work">research</a>
-          <a href="#studio">key research</a>
-          <a href="#playground">location</a>
+        <nav className="top-navigation" aria-label="Page sections">
+          {topNavigation.map(([label, section]) => (
+            <a href={`#${section}`} key={section}>
+              {label}
+            </a>
+          ))}
         </nav>
         <button
           className="menu-toggle"
@@ -236,14 +294,26 @@ function Header({ compact }) {
         id="site-menu-panel"
         aria-hidden={!menuOpen}
       >
-        <nav className="site-menu-links" aria-label="External pages">
-          {menuLinks.map(([label, href]) => (
+        <nav className="site-menu-links" aria-label="Site pages">
+          {menuLinks.map(({ label, href, internal }) => (
             <a
               href={href}
-              target="_blank"
-              rel="noreferrer"
+              target={internal ? undefined : "_blank"}
+              rel={internal ? undefined : "noreferrer"}
               tabIndex={menuOpen ? undefined : -1}
-              onClick={closeMenu}
+              aria-current={internal && currentPath === href ? "page" : undefined}
+              onClick={(event) => {
+                if (internal) {
+                  event.preventDefault();
+                  setMenuOpen(false);
+                  setMenuSettled(false);
+                  setMenuClosing(false);
+                  setMenuReturning(false);
+                  if (currentPath !== href) onNavigate(href, label);
+                  return;
+                }
+                closeMenu();
+              }}
               key={label}
             >
               <span>{label}</span>
@@ -255,7 +325,7 @@ function Header({ compact }) {
   );
 }
 
-function Hero() {
+function Hero({ showEntry }) {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -304,13 +374,15 @@ function Hero() {
           <span className="showreel-play" aria-hidden="true" />
         </button>
       </div>
-      <div className="hero-entry" aria-hidden="true">
-        <div className="hero-entry-word">
-          <span className="hero-entry-ai">AI</span>
-          <span className="hero-entry-cs">CS</span>
+      {showEntry && (
+        <div className="hero-entry" aria-hidden="true">
+          <div className="hero-entry-word">
+            <span className="hero-entry-ai">AI</span>
+            <span className="hero-entry-cs">CS</span>
+          </div>
+          <div className="hero-entry-bar" />
         </div>
-        <div className="hero-entry-bar" />
-      </div>
+      )}
     </section>
   );
 }
@@ -366,7 +438,14 @@ function Studio() {
       </div>
       <div className="publication-grid" data-reveal>
         {publications.map((publication, index) => (
-          <article className="publication-card" key={publication.title}>
+          <a
+            className="publication-card"
+            href={publication.url}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${publication.title} full text`}
+            key={publication.title}
+          >
             <span className="publication-number">
               {String(index + 1).padStart(2, "0")}
             </span>
@@ -376,16 +455,11 @@ function Studio() {
             <div className="publication-content">
               <span className="publication-venue">{publication.venue}</span>
               <h3>{publication.title}</h3>
-              <a
-                href={publication.url}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`${publication.title} full text`}
-              >
+              <span className="publication-link">
                 Full text <span aria-hidden="true">↗</span>
-              </a>
+              </span>
             </div>
-          </article>
+          </a>
         ))}
       </div>
     </section>
@@ -427,16 +501,22 @@ function Playground() {
   );
 }
 
-function Footer() {
+function Footer({ currentPath, onNavigate }) {
   return (
     <footer className="footer section-pad">
       <div className="footer-brand-panel">
-        <nav className="footer-page-links" aria-label="External pages">
-          {menuLinks.map(([label, href]) => (
+        <nav className="footer-page-links" aria-label="Site pages">
+          {menuLinks.map(({ label, href, internal }) => (
             <a
               href={href}
-              target="_blank"
-              rel="noreferrer"
+              target={internal ? undefined : "_blank"}
+              rel={internal ? undefined : "noreferrer"}
+              aria-current={internal && currentPath === href ? "page" : undefined}
+              onClick={(event) => {
+                if (!internal) return;
+                event.preventDefault();
+                if (currentPath !== href) onNavigate(href, label);
+              }}
               key={label}
             >
               <span>{label}</span>
@@ -496,10 +576,119 @@ function Footer() {
   );
 }
 
+function HomePage({ showHeroEntry }) {
+  return (
+    <main>
+      <Hero showEntry={showHeroEntry} />
+      <Work />
+      <Studio />
+      <Playground />
+    </main>
+  );
+}
+
 export default function App() {
   const [scroll, setScroll] = useState(0);
+  const [pageTransition, setPageTransition] = useState(null);
+  const [showHomeIntro, setShowHomeIntro] = useState(
+    window.location.pathname === "/",
+  );
+  const transitionTimers = useRef([]);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isProfile = location.pathname === "/profile";
+  const isPublication = location.pathname === "/publication";
+  const isResearch = location.pathname === "/research";
+  const isLecture = location.pathname === "/lecture";
+  const isMembers = location.pathname === "/members";
+  const isEvents = location.pathname === "/events";
+
   useSmoothScroll();
-  useReveal();
+  useReveal(location.pathname);
+
+  useEffect(() => {
+    if (isProfile) {
+      document.title = "Profile — AICS";
+      return;
+    }
+
+    if (isPublication) {
+      document.title = "Publications — AICS";
+      return;
+    }
+
+    if (isResearch) {
+      document.title = "Research — AICS";
+      return;
+    }
+
+    if (isLecture) {
+      document.title = "Lectures — AICS";
+      return;
+    }
+
+    if (isMembers) {
+      document.title = "Members — AICS";
+      return;
+    }
+
+    document.title = isEvents ? "Events — AICS" : "AICS";
+  }, [isProfile, isPublication, isResearch, isLecture, isMembers, isEvents]);
+
+  useEffect(
+    () => () => {
+      transitionTimers.current.forEach((timer) => window.clearTimeout(timer));
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!location.hash) return;
+
+    const scrollTimer = window.setTimeout(() => {
+      document.querySelector(location.hash)?.scrollIntoView({ behavior: "instant" });
+    }, 80);
+
+    return () => window.clearTimeout(scrollTimer);
+  }, [location.pathname, location.hash]);
+
+  const navigateWithTransition = (destination, label) => {
+    if (pageTransition) return;
+    setShowHomeIntro(false);
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      navigate(destination);
+      if (!destination.includes("#")) {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
+      return;
+    }
+
+    setPageTransition({ phase: "starting", label });
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setPageTransition({ phase: "covering", label });
+      });
+    });
+
+    const navigateTimer = window.setTimeout(() => {
+      navigate(destination);
+      if (!destination.includes("#")) {
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
+      setPageTransition({ phase: "revealing", label });
+    }, 520);
+
+    const finishTimer = window.setTimeout(() => {
+      setPageTransition(null);
+      transitionTimers.current = [];
+    }, 1180);
+
+    transitionTimers.current = [navigateTimer, finishTimer];
+  };
 
   useEffect(() => {
     const update = () => {
@@ -509,7 +698,7 @@ export default function App() {
     update();
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
-  }, []);
+  }, [location.pathname]);
 
   return (
     <>
@@ -517,14 +706,34 @@ export default function App() {
         className="scroll-progress"
         style={{ transform: `scaleX(${scroll})` }}
       />
-      <Header compact={scroll > 0.012} />
-      <main>
-        <Hero />
-        <Work />
-        <Studio />
-        <Playground />
-      </main>
-      <Footer />
+      <Header
+        compact={scroll > 0.012}
+        currentPath={location.pathname}
+        onNavigate={navigateWithTransition}
+      />
+      <Routes>
+        <Route path="/" element={<HomePage showHeroEntry={showHomeIntro} />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/publication" element={<PublicationPage />} />
+        <Route path="/research" element={<ResearchPage />} />
+        <Route path="/lecture" element={<LecturePage />} />
+        <Route path="/members" element={<MembersPage />} />
+        <Route path="/events" element={<EventsPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Footer
+        currentPath={location.pathname}
+        onNavigate={navigateWithTransition}
+      />
+      {pageTransition && (
+        <div
+          className={`page-transition page-transition--${pageTransition.phase}`}
+          aria-hidden="true"
+        >
+          <span>{pageTransition.label}</span>
+          <small>AICS / Soonchunhyang University</small>
+        </div>
+      )}
     </>
   );
 }
