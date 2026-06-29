@@ -143,25 +143,63 @@ function useSmoothScroll() {
 
 function Header({ compact }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuSettled, setMenuSettled] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
+  const [menuReturning, setMenuReturning] = useState(false);
+
+  useEffect(() => {
+    if (!menuOpen || menuClosing) {
+      setMenuSettled(false);
+      return undefined;
+    }
+
+    const settleTimer = window.setTimeout(() => setMenuSettled(true), 1250);
+    return () => window.clearTimeout(settleTimer);
+  }, [menuOpen, menuClosing]);
+
+  useEffect(() => {
+    if (!menuClosing) return undefined;
+
+    const collapseTimer = window.setTimeout(() => {
+      setMenuOpen(false);
+      setMenuClosing(false);
+      setMenuReturning(true);
+    }, 550);
+
+    return () => window.clearTimeout(collapseTimer);
+  }, [menuClosing]);
+
+  useEffect(() => {
+    if (!menuReturning) return undefined;
+
+    const returnTimer = window.setTimeout(() => setMenuReturning(false), 700);
+    return () => window.clearTimeout(returnTimer);
+  }, [menuReturning]);
+
+  const closeMenu = () => {
+    if (!menuOpen || menuClosing || menuReturning) return;
+    setMenuSettled(false);
+    setMenuClosing(true);
+  };
 
   useEffect(() => {
     if (!menuOpen) return undefined;
 
     const closeOnEscape = (event) => {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === "Escape") closeMenu();
     };
 
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [menuOpen]);
+  }, [menuOpen, menuClosing, menuReturning]);
 
   return (
     <header
-      className={`site-header ${compact ? "site-header--compact" : ""} ${menuOpen ? "site-header--open" : ""}`}
+      className={`site-header ${compact ? "site-header--compact" : ""} ${menuOpen ? "site-header--open" : ""} ${menuSettled ? "site-header--settled" : ""} ${menuClosing ? "site-header--closing" : ""} ${menuReturning ? "site-header--returning" : ""}`}
     >
       <div className="site-header-bar">
         <a className="brand" href="#top" aria-label="AICS home">
-          AICS®
+          AICS©
         </a>
         <nav className="top-navigation" aria-label="Primary navigation">
           <a href="#work">research</a>
@@ -174,11 +212,22 @@ function Header({ compact }) {
           aria-expanded={menuOpen}
           aria-controls="site-menu-panel"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
-          onClick={() => setMenuOpen((open) => !open)}
+          onClick={() => {
+            if (menuOpen) {
+              closeMenu();
+              return;
+            }
+
+            if (menuReturning) return;
+            setMenuSettled(false);
+            setMenuOpen(true);
+          }}
         >
-          <span />
-          <span />
-          <span />
+          <span className="menu-toggle-icon" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
         </button>
       </div>
 
@@ -194,7 +243,7 @@ function Header({ compact }) {
               target="_blank"
               rel="noreferrer"
               tabIndex={menuOpen ? undefined : -1}
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
               key={label}
             >
               <span>{label}</span>
@@ -394,7 +443,7 @@ function Footer() {
             </a>
           ))}
         </nav>
-        <div className="footer-logo">AICS®</div>
+        <div className="footer-logo">AICS©</div>
       </div>
       <div className="footer-partnerships">
         <div className="footer-partnerships-main">
