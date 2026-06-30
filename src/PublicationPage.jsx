@@ -455,17 +455,14 @@ export default function PublicationPage() {
         aria-hidden={!showYearNav}
       >
         {newerYear ? (
-          <a
+          <button
+            type="button"
             className="publication-year-nav-step publication-year-nav-step--newer"
-            href={`#publication-year-${newerYear}`}
             aria-label={`Go to ${newerYear}`}
-            onClick={(event) => {
-              event.preventDefault();
-              jumpToYear(newerYear);
-            }}
+            onClick={() => jumpToYear(newerYear)}
           >
             <strong>{newerYear}</strong>
-          </a>
+          </button>
         ) : (
           <span className="publication-year-nav-step is-disabled" aria-hidden="true">
             <strong>—</strong>
@@ -494,17 +491,14 @@ export default function PublicationPage() {
         </form>
 
         {olderYear ? (
-          <a
+          <button
+            type="button"
             className="publication-year-nav-step publication-year-nav-step--older"
-            href={`#publication-year-${olderYear}`}
             aria-label={`Go to ${olderYear}`}
-            onClick={(event) => {
-              event.preventDefault();
-              jumpToYear(olderYear);
-            }}
+            onClick={() => jumpToYear(olderYear)}
           >
             <strong>{olderYear}</strong>
-          </a>
+          </button>
         ) : (
           <span className="publication-year-nav-step is-disabled" aria-hidden="true">
             <strong>—</strong>
