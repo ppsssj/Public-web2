@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 const directLinks = {
   symbolnet: "https://ieeexplore.ieee.org/abstract/document/10980088/",
   csi300: "https://www.mdpi.com/2079-9292/14/9/1729",
@@ -253,12 +255,105 @@ const publicationCount = publicationGroups.reduce(
   0,
 );
 
+const publicationYears = publicationGroups
+  .map((group) => group.year)
+  .filter((year) => /^\d{4}$/.test(year));
+
 function scholarLink(citation) {
   return `https://scholar.google.com/scholar?q=${encodeURIComponent(citation)}`;
 }
 
 export default function PublicationPage() {
   let publicationIndex = 0;
+  const [currentYear, setCurrentYear] = useState(publicationYears[0]);
+  const [yearQuery, setYearQuery] = useState(publicationYears[0]);
+  const [yearError, setYearError] = useState("");
+  const [showYearNav, setShowYearNav] = useState(false);
+
+  useEffect(() => {
+    let frame = 0;
+
+    const updateCurrentYear = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const triggerLine = Math.min(window.innerHeight * 0.45, 420);
+        let visibleYear = publicationYears[0];
+
+        publicationYears.forEach((year) => {
+          const group = document.getElementById(`publication-year-${year}`);
+          if (group && group.getBoundingClientRect().top <= triggerLine) {
+            visibleYear = year;
+          }
+        });
+
+        const archive = document.getElementById("publication-archive");
+        const archiveRect = archive?.getBoundingClientRect();
+        setShowYearNav(
+          Boolean(
+            archiveRect &&
+              archiveRect.top <= window.innerHeight * 0.7 &&
+              archiveRect.bottom > 120,
+          ),
+        );
+        setCurrentYear(visibleYear);
+      });
+    };
+
+    updateCurrentYear();
+    window.addEventListener("scroll", updateCurrentYear, { passive: true });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", updateCurrentYear);
+    };
+  }, []);
+
+  useEffect(() => {
+    setYearQuery(currentYear);
+    setYearError("");
+  }, [currentYear]);
+
+  const jumpToYear = (year) => {
+    setYearError("");
+    setCurrentYear(year);
+    const targetId = `publication-year-${year}`;
+    const target = document.getElementById(targetId);
+
+    window.history.pushState(null, "", `#${targetId}`);
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleYearSubmit = (event) => {
+    event.preventDefault();
+    const year = yearQuery.trim();
+
+    if (!publicationYears.includes(year)) {
+      setYearError("Enter a year from 2016 to 2026");
+      return;
+    }
+
+    jumpToYear(year);
+  };
+
+  const handleYearChange = (event) => {
+    const year = event.target.value.replace(/\D/g, "").slice(0, 4);
+    setYearQuery(year);
+    setYearError("");
+
+    if (publicationYears.includes(year)) {
+      jumpToYear(year);
+    } else if (year.length === 4) {
+      setYearError("Enter a year from 2016 to 2026");
+    }
+  };
+
+  const currentYearIndex = publicationYears.indexOf(currentYear);
+  const newerYear =
+    currentYearIndex > 0 ? publicationYears[currentYearIndex - 1] : null;
+  const olderYear =
+    currentYearIndex < publicationYears.length - 1
+      ? publicationYears[currentYearIndex + 1]
+      : null;
 
   return (
     <main className="publication-page">
@@ -311,7 +406,7 @@ export default function PublicationPage() {
           {publicationGroups.map((group) => (
             <section
               className="publication-year-group"
-              id={group.year === "2026" ? "publication-recent" : undefined}
+              id={`publication-year-${group.year.toLowerCase()}`}
               data-reveal
               key={group.year}
             >
@@ -353,6 +448,69 @@ export default function PublicationPage() {
           ))}
         </div>
       </section>
+
+      <nav
+        className={`publication-year-nav ${showYearNav ? "is-visible" : ""}`}
+        aria-label="Publication years"
+        aria-hidden={!showYearNav}
+      >
+        {newerYear ? (
+          <a
+            className="publication-year-nav-step publication-year-nav-step--newer"
+            href={`#publication-year-${newerYear}`}
+            aria-label={`Go to ${newerYear}`}
+            onClick={(event) => {
+              event.preventDefault();
+              jumpToYear(newerYear);
+            }}
+          >
+            <strong>{newerYear}</strong>
+          </a>
+        ) : (
+          <span className="publication-year-nav-step is-disabled" aria-hidden="true">
+            <strong>—</strong>
+          </span>
+        )}
+
+        <form onSubmit={handleYearSubmit} noValidate>
+          {yearError && (
+            <span className="publication-year-nav-error" role="status">
+              {yearError}
+            </span>
+          )}
+          <label htmlFor="publication-year-input">Year</label>
+          <input
+            id="publication-year-input"
+            type="text"
+            inputMode="numeric"
+            maxLength="4"
+            placeholder="YYYY"
+            value={yearQuery}
+            aria-invalid={Boolean(yearError)}
+            aria-label="Publication year"
+            onFocus={(event) => event.target.select()}
+            onChange={handleYearChange}
+          />
+        </form>
+
+        {olderYear ? (
+          <a
+            className="publication-year-nav-step publication-year-nav-step--older"
+            href={`#publication-year-${olderYear}`}
+            aria-label={`Go to ${olderYear}`}
+            onClick={(event) => {
+              event.preventDefault();
+              jumpToYear(olderYear);
+            }}
+          >
+            <strong>{olderYear}</strong>
+          </a>
+        ) : (
+          <span className="publication-year-nav-step is-disabled" aria-hidden="true">
+            <strong>—</strong>
+          </span>
+        )}
+      </nav>
     </main>
   );
 }

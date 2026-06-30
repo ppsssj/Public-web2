@@ -104,6 +104,39 @@ const menuLinks = [
   { label: "Events", href: "/events", internal: true },
 ];
 
+const recentActivities = [
+  {
+    number: "01",
+    type: "Poster Session",
+    date: "2023.06.20",
+    title: "KCC 2023 in Jeju",
+    description:
+      "Presented our research on outlier detection for sharp-decline stock analysis.",
+    image: "/assets/Events/event-03-poster.jpg",
+    href: "/events#event-kcc",
+  },
+  {
+    number: "02",
+    type: "Oral Session",
+    date: "2023.03.12",
+    title: "ICCE 2023 in Stockholm",
+    description:
+      "Shared a dimensionality-reduction study for stock-price forecasting.",
+    image: "/assets/Events/event-02-session.jpg",
+    href: "/events#event-icce",
+  },
+  {
+    number: "03",
+    type: "Poster Session",
+    date: "2023.01.06",
+    title: "Japan–Korea Joint Workshop",
+    description:
+      "Introduced a stroke-based research design for Chinese font recommendation.",
+    image: "/assets/Events/event-01-session.jpg",
+    href: "/events#event-jk",
+  },
+];
+
 const headerMenuLinks = [
   { label: "Home", href: "/", internal: true },
   ...menuLinks,
@@ -113,6 +146,7 @@ const topNavigationByPath = {
   "/": [
     ["research", "work"],
     ["key research", "studio"],
+    ["activity", "activity"],
     ["location", "playground"],
   ],
   "/profile": [
@@ -122,7 +156,6 @@ const topNavigationByPath = {
   ],
   "/publication": [
     ["overview", "publication-overview"],
-    ["recent", "publication-recent"],
     ["archive", "publication-archive"],
   ],
   "/research": [
@@ -141,9 +174,8 @@ const topNavigationByPath = {
     ["theses", "members-theses"],
   ],
   "/events": [
-    ["J-K", "event-jk"],
-    ["ICCE", "event-icce"],
-    ["KCC", "event-kcc"],
+    ["overview", "events-overview"],
+    ["archive", "events-archive"],
   ],
 };
 
@@ -471,6 +503,57 @@ function Studio() {
   );
 }
 
+function Activity() {
+  return (
+    <section className="activity section-pad" id="activity">
+      <header className="activity-intro" data-reveal>
+        <div>
+          <span className="activity-kicker">Latest from the lab</span>
+          <h2>
+            Recent<br />Activities <Arrow />
+          </h2>
+        </div>
+        <div className="activity-intro-copy">
+          <p>
+            Research in motion—presentations, academic exchange, and moments
+            from the field beyond our lab.
+          </p>
+          <a href="/events">
+            View all activities <Arrow />
+          </a>
+        </div>
+      </header>
+
+      <div className="activity-grid">
+        {recentActivities.map((activity) => (
+          <a
+            className="activity-card"
+            href={activity.href}
+            data-reveal
+            key={activity.title}
+          >
+            <figure className="activity-image">
+              <img src={activity.image} alt="" loading="lazy" />
+              <span>{activity.number} / 03</span>
+            </figure>
+            <div className="activity-card-copy">
+              <div className="activity-meta">
+                <span>{activity.type}</span>
+                <time dateTime={activity.date}>{activity.date}</time>
+              </div>
+              <h3>{activity.title}</h3>
+              <p>{activity.description}</p>
+              <span className="activity-card-arrow" aria-hidden="true">
+                ↗
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Playground() {
   const address = "충남 아산시 순천향로 22-11 멀티미디어 5층 507호";
   const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
@@ -587,6 +670,7 @@ function HomePage({ showHeroEntry }) {
       <Hero showEntry={showHeroEntry} />
       <Work />
       <Studio />
+      <Activity />
       <Playground />
     </main>
   );

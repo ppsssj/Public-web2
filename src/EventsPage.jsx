@@ -46,7 +46,11 @@ const events = [
 export default function EventsPage() {
   return (
     <main className="events-page">
-      <section className="events-hero" aria-labelledby="events-title">
+      <section
+        className="events-hero"
+        id="events-overview"
+        aria-labelledby="events-title"
+      >
         <div className="events-page-kicker events-page-enter">
           <span>Conference archive</span>
           <span>Presentations &amp; field notes</span>
@@ -78,7 +82,7 @@ export default function EventsPage() {
         </div>
       </section>
 
-      <section className="events-archive">
+      <section className="events-archive" id="events-archive">
         <header className="events-archive-heading" data-reveal>
           <span>Field notes</span>
           <h2>Academic<br />Exchange</h2>
