@@ -104,6 +104,11 @@ const menuLinks = [
   { label: "Events", href: "/events", internal: true },
 ];
 
+const headerMenuLinks = [
+  { label: "Home", href: "/", internal: true },
+  ...menuLinks,
+];
+
 const topNavigationByPath = {
   "/": [
     ["research", "work"],
@@ -295,7 +300,7 @@ function Header({ compact, currentPath, onNavigate }) {
         aria-hidden={!menuOpen}
       >
         <nav className="site-menu-links" aria-label="Site pages">
-          {menuLinks.map(({ label, href, internal }) => (
+          {headerMenuLinks.map(({ label, href, internal }) => (
             <a
               href={href}
               target={internal ? undefined : "_blank"}
