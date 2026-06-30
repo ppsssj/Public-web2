@@ -3328,6 +3328,7 @@ button {
 }
 
 .footer-logo {
+  display: block;
   margin-top: clamp(42px, 4.5vw, 76px);
   font-size: clamp(75px, 10.56vw, 202px);
   letter-spacing: -0.09em;
@@ -3501,6 +3502,15 @@ button {
   height: auto;
   object-fit: contain;
   object-position: left center;
+}
+
+.footer-bottom-marks > a {
+  display: block;
+  width: min(100%, 230px);
+}
+
+.footer-bottom-marks > a img {
+  width: 100%;
 }
 
 @media (max-width: 900px) {

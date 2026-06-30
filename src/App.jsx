@@ -611,7 +611,21 @@ function Footer({ currentPath, onNavigate }) {
             </a>
           ))}
         </nav>
-        <div className="footer-logo">AICS©</div>
+        <a
+          className="footer-logo"
+          href="/"
+          aria-label="Go to AICS home"
+          onClick={(event) => {
+            event.preventDefault();
+            if (currentPath !== "/") {
+              onNavigate("/", "Home");
+              return;
+            }
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
+          AICS©
+        </a>
       </div>
       <div className="footer-partnerships">
         <div className="footer-partnerships-main">
@@ -653,10 +667,17 @@ function Footer({ currentPath, onNavigate }) {
               src="/assets/Logo/AI%20CS%20LAB%20%E1%84%85%E1%85%A9%E1%84%80%E1%85%A9%20-%20%E1%84%80%E1%85%A1%E1%84%85%E1%85%A9%E1%84%92%E1%85%A7%E1%86%BC%20%E1%84%80%E1%85%A5%E1%86%B7%E1%84%8B%E1%85%B3%E1%86%AB%E1%84%80%E1%85%B3%E1%86%AF%E1%84%8A%E1%85%B5%20%E1%84%87%E1%85%A2%E1%84%80%E1%85%A7%E1%86%BC%E1%84%8C%E1%85%A6%E1%84%80%E1%85%A5.png"
               alt="AICS Lab"
             />
-            <img
-              src="/assets/Logo/sch_Logo1.svg"
-              alt="Soonchunhyang University"
-            />
+            <a
+              href="https://home.sch.ac.kr/sch/index.jsp"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Visit Soonchunhyang University"
+            >
+              <img
+                src="/assets/Logo/sch_Logo1.svg"
+                alt="Soonchunhyang University"
+              />
+            </a>
           </div>
         </div>
       </div>
