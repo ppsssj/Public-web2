@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const directLinks = {
   symbolnet: "https://ieeexplore.ieee.org/abstract/document/10980088/",
@@ -269,9 +269,11 @@ export default function PublicationPage() {
   const [yearQuery, setYearQuery] = useState(publicationYears[0]);
   const [yearError, setYearError] = useState("");
   const [showYearNav, setShowYearNav] = useState(false);
+  const yearNavigationTarget = useRef(null);
 
   useEffect(() => {
     let frame = 0;
+    let scrollSettleTimer = 0;
 
     const updateCurrentYear = () => {
       window.cancelAnimationFrame(frame);
@@ -295,16 +297,29 @@ export default function PublicationPage() {
               archiveRect.bottom > 120,
           ),
         );
-        setCurrentYear(visibleYear);
+        setCurrentYear(yearNavigationTarget.current || visibleYear);
       });
     };
 
+    const handleScroll = () => {
+      window.clearTimeout(scrollSettleTimer);
+      updateCurrentYear();
+
+      if (yearNavigationTarget.current) {
+        scrollSettleTimer = window.setTimeout(() => {
+          yearNavigationTarget.current = null;
+          updateCurrentYear();
+        }, 220);
+      }
+    };
+
     updateCurrentYear();
-    window.addEventListener("scroll", updateCurrentYear, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", updateCurrentYear);
+      window.clearTimeout(scrollSettleTimer);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -315,6 +330,7 @@ export default function PublicationPage() {
 
   const jumpToYear = (year) => {
     setYearError("");
+    yearNavigationTarget.current = year;
     setCurrentYear(year);
     const targetId = `publication-year-${year}`;
     const target = document.getElementById(targetId);
