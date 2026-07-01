@@ -247,8 +247,10 @@ button {
     transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.menu-toggle:hover .menu-toggle-icon {
-  transform: rotate(90deg);
+@media (hover: hover) and (pointer: fine) {
+  .menu-toggle:hover .menu-toggle-icon {
+    transform: rotate(90deg);
+  }
 }
 
 .site-header--open .menu-toggle {
@@ -259,8 +261,10 @@ button {
   transform: rotate(90deg);
 }
 
-.site-header--open.site-header--settled .menu-toggle:hover .menu-toggle-icon {
-  transform: rotate(180deg);
+@media (hover: hover) and (pointer: fine) {
+  .site-header--open.site-header--settled .menu-toggle:hover .menu-toggle-icon {
+    transform: rotate(180deg);
+  }
 }
 
 .site-header--open .menu-toggle-icon > span {
@@ -295,7 +299,7 @@ button {
 }
 
 .site-header--returning .menu-toggle .menu-toggle-icon {
-  transform: rotate(90deg);
+  transform: rotate(0deg);
 }
 
 .site-menu-panel {
