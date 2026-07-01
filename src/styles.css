@@ -3228,6 +3228,8 @@ button {
 }
 
 .profile-focus-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 82%;
   margin: 0 0 0 auto;
   padding: 0;
@@ -3247,13 +3249,23 @@ button {
   transition: opacity 0.75s, transform 0.75s, color 0.3s;
 }
 
+.profile-focus-list li:nth-child(odd) {
+  padding-right: clamp(18px, 2.5vw, 48px);
+  border-right: 1px solid rgba(241, 241, 241, 0.28);
+}
+
+.profile-focus-list li:nth-child(even) {
+  padding-left: clamp(18px, 2.5vw, 48px);
+}
+
 .profile-focus-list li > span:first-child {
   font-size: 11px;
   font-weight: 700;
 }
 
 .profile-focus-list strong {
-  font-size: clamp(29px, 4.4vw, 84px);
+  min-width: 0;
+  font-size: clamp(29px, 3.05vw, 58px);
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: -0.055em;
@@ -4422,6 +4434,7 @@ button {
   }
 
   .profile-focus-list {
+    grid-template-columns: 1fr;
     width: 100%;
   }
 
@@ -4429,6 +4442,9 @@ button {
     grid-template-columns: 32px 1fr auto;
     gap: 10px;
     min-height: 105px;
+    padding-right: 0;
+    padding-left: 0;
+    border-right: 0;
   }
 
   .profile-focus-list strong {

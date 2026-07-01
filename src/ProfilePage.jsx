@@ -153,7 +153,7 @@ export default function ProfilePage() {
             <li data-reveal key={focus}>
               <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{focus}</strong>
-              <span aria-hidden="true">↘</span>
+              {/* <span aria-hidden="true">↘</span> */}
             </li>
           ))}
         </ol>
