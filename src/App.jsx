@@ -7,6 +7,7 @@ import ResearchPage from "./ResearchPage.jsx";
 import LecturePage from "./LecturePage.jsx";
 import MembersPage from "./MembersPage.jsx";
 import EventsPage from "./EventsPage.jsx";
+import ContactPage from "./ContactPage.jsx";
 
 const videoSource = "/assets/a.mp4";
 
@@ -102,6 +103,7 @@ const menuLinks = [
   { label: "Lecture", href: "/lecture", internal: true },
   { label: "Members", href: "/members", internal: true },
   { label: "Events", href: "/events", internal: true },
+  { label: "Contact", href: "/contact", internal: true },
 ];
 
 const recentActivities = [
@@ -176,6 +178,11 @@ const topNavigationByPath = {
   "/events": [
     ["overview", "events-overview"],
     ["archive", "events-archive"],
+  ],
+  "/contact": [
+    ["overview", "contact-overview"],
+    ["apply", "lab-application"],
+    ["email", "contact-details"],
   ],
 };
 
@@ -712,6 +719,7 @@ export default function App() {
   const isLecture = location.pathname === "/lecture";
   const isMembers = location.pathname === "/members";
   const isEvents = location.pathname === "/events";
+  const isContact = location.pathname === "/contact";
 
   useSmoothScroll();
   useReveal(location.pathname);
@@ -742,8 +750,13 @@ export default function App() {
       return;
     }
 
+    if (isContact) {
+      document.title = "Contact — AICS";
+      return;
+    }
+
     document.title = isEvents ? "Events — AICS" : "AICS";
-  }, [isProfile, isPublication, isResearch, isLecture, isMembers, isEvents]);
+  }, [isProfile, isPublication, isResearch, isLecture, isMembers, isEvents, isContact]);
 
   useEffect(
     () => () => {
@@ -829,6 +842,7 @@ export default function App() {
         <Route path="/lecture" element={<LecturePage />} />
         <Route path="/members" element={<MembersPage />} />
         <Route path="/events" element={<EventsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer
