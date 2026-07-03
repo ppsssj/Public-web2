@@ -4288,12 +4288,13 @@ button {
   }
 
   .site-header {
-    padding: 0 16px;
+    --menu-open-height: 336px;
+    padding: 0 20px;
   }
 
   .site-header-bar {
-    grid-template-columns: auto 1fr auto;
-    gap: 10px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: clamp(10px, 3vw, 18px);
   }
 
   .site-header--compact {
@@ -4308,14 +4309,25 @@ button {
   }
 
   .top-navigation {
+    display: flex;
     min-width: 0;
-    justify-content: flex-end;
-    gap: 12px;
-    font-size: 10px;
+    justify-content: center;
+    gap: clamp(6px, 2vw, 11px);
+    overflow: hidden;
+    font-size: clamp(7px, 2.1vw, 10px);
+    white-space: nowrap;
+    transition: opacity 0.25s, visibility 0.25s;
   }
 
-  .top-navigation a {
-    white-space: nowrap;
+  .site-header--open .top-navigation {
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .site-header--open .brand,
+  .site-header--open .menu-toggle {
+    transform: none;
   }
 
   .menu-toggle {
@@ -4326,21 +4338,27 @@ button {
   }
 
   .site-menu-panel {
-    padding: 6px 0 14px;
+    padding: 8px 0 20px;
   }
 
   .site-menu-links {
-    width: calc(100% - 34px);
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-    grid-template-rows: 1fr;
-    margin-right: 34px;
-    overflow: hidden;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+    margin: 0;
+    border-top: 1px solid var(--line);
   }
 
   .site-menu-links a {
-    gap: 3px;
-    padding: 0 4px;
-    font-size: 8px;
+    justify-content: flex-start;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+  }
+
+  .site-menu-links a:nth-child(odd) {
+    padding-left: 0;
+    border-right: 1px solid var(--line);
   }
 
   .hero {
