@@ -150,7 +150,7 @@ export default function ResearchPage() {
           {researchProjects.map((project, index) => (
             <article className="research-project" data-reveal key={project.title}>
               <span className="research-project-number">
-                {String(index + 1).padStart(2, "0")}
+                {String(researchProjects.length - index).padStart(2, "0")}
               </span>
               <time>{project.period}</time>
               <div className="research-project-main">

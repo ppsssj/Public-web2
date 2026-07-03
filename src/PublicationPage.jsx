@@ -434,6 +434,7 @@ export default function PublicationPage() {
               <div className="publication-rows">
                 {group.items.map((publication) => {
                   publicationIndex += 1;
+                  const publicationNumber = publicationCount - publicationIndex + 1;
                   const direct = Boolean(publication.url);
 
                   return (
@@ -446,7 +447,7 @@ export default function PublicationPage() {
                       key={publication.citation}
                     >
                       <span className="publication-row-number">
-                        {String(publicationIndex).padStart(2, "0")}
+                        {String(publicationNumber).padStart(2, "0")}
                       </span>
                       <span className="publication-row-type">{publication.type}</span>
                       <span className="publication-row-citation">
