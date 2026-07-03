@@ -1,52 +1,5 @@
-const education = [
-  {
-    period: "2011.03 — 2015.02",
-    degree: "B.S. in Multimedia Science",
-    institution: "Sookmyung Women's University",
-  },
-  {
-    period: "2015.03 — 2021.02",
-    degree: "Ph.D. in IT Engineering",
-    institution: "Sookmyung Women's University",
-  },
-];
-
-const career = [
-  {
-    period: "2025.09 — Present",
-    role: "Assistant Professor",
-    institution: "Soonchunhyang University · Computer Software Engineering",
-  },
-  {
-    period: "2022.04 — 2025.08",
-    role: "Assistant Professor",
-    institution: "Semyung University · School of Computer Science",
-  },
-  {
-    period: "2021.09 — 2022.03",
-    role: "Principal Researcher",
-    institution: "ICT Convergence Research Institute, Sookmyung Women's University",
-  },
-  {
-    period: "2020.09 — 2022.02",
-    role: "Lecturer",
-    institution: "Seoul National University of Science and Technology",
-  },
-  {
-    period: "2020.09 — 2021.08",
-    role: "Lecturer",
-    institution: "Sookmyung Women's University",
-  },
-];
-
-const researchFocus = [
-  "Artificial Intelligence",
-  "Machine Learning",
-  "Financial Forecasting",
-  "Digital Accessibility",
-  "AI Applications",
-  "Explainable AI",
-];
+import { career, education, profileDetails, researchFocus } from "./data/profile.js";
+import { siteSettings } from "./data/site.js";
 
 function ProfileArrow() {
   return <span aria-hidden="true">↗</span>;
@@ -73,22 +26,19 @@ export default function ProfilePage() {
           <div className="profile-identity profile-enter">
             <div>
               <p className="profile-label">Principal Investigator</p>
-              <h2>Yoojeong Song</h2>
+              <h2>{profileDetails.name}</h2>
               <p className="profile-position">
-                Assistant Professor<br />
-                Computer Software Engineering<br />
-                Soonchunhyang University
+                {profileDetails.position}<br />
+                {profileDetails.department}<br />
+                {profileDetails.university}
               </p>
             </div>
 
             <div className="profile-contact">
-              <a href="mailto:yoojeong@sch.ac.kr">
-                yoojeong@sch.ac.kr <ProfileArrow />
+              <a href={`mailto:${siteSettings.contactEmail}`}>
+                {siteSettings.contactEmail} <ProfileArrow />
               </a>
-              <p>
-                Building practical and human-centered artificial intelligence
-                through prediction, accessibility, and explainability.
-              </p>
+              <p>{profileDetails.introduction}</p>
             </div>
           </div>
 

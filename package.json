@@ -6,11 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seed:check": "node scripts/seed-postgres.mjs --dry-run",
+    "seed": "node scripts/seed-postgres.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
     "lenis": "^1.3.25",
+    "pg": "^8.22.0",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "^7.18.0",

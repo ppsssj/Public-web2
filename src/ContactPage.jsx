@@ -1,16 +1,10 @@
 import { useRef, useState } from "react";
-
-const researchFields = [
-  "Artificial Intelligence",
-  "Machine Learning",
-  "Financial Forecasting",
-  "Digital Accessibility",
-  "AI Applications",
-  "Explainable AI",
-];
-
-const MAX_APPLICATION_FILE_SIZE = 3 * 1024 * 1024;
-const allowedApplicationExtensions = ["pdf", "doc", "docx", "hwp"];
+import {
+  graduateApplicationSettings,
+  researchFields,
+  undergraduateApplicationTypes,
+} from "./data/contact.js";
+import { siteSettings } from "./data/site.js";
 
 const readFileAsBase64 = (file) => new Promise((resolve, reject) => {
   const reader = new FileReader();
@@ -89,14 +83,14 @@ export default function ContactPage() {
     }
 
     const extension = file.name.split(".").pop()?.toLowerCase();
-    if (!allowedApplicationExtensions.includes(extension)) {
+    if (!graduateApplicationSettings.allowedExtensions.includes(extension)) {
       event.target.value = "";
       setGraduateFile(null);
       setStatus({ type: "error", message: "PDF, DOC, DOCX, HWP 파일만 업로드할 수 있습니다." });
       return;
     }
 
-    if (file.size > MAX_APPLICATION_FILE_SIZE) {
+    if (file.size > graduateApplicationSettings.maxFileSize) {
       event.target.value = "";
       setGraduateFile(null);
       setStatus({ type: "error", message: "지원서 파일은 3MB 이하로 업로드해 주세요." });
@@ -160,7 +154,7 @@ export default function ContactPage() {
           <p>연구를 함께 배우고, 질문하고, 실제 문제를 해결해 나갈 새로운 구성원을 기다립니다.</p>
           <dl>
             <div><dt>Who</dt><dd>Undergraduate · Graduate</dd></div>
-            <div><dt>Where</dt><dd>Soonchunhyang University</dd></div>
+            <div><dt>Where</dt><dd>{siteSettings.universityName}</dd></div>
             <div><dt>Reply</dt><dd>After reviewing your application</dd></div>
           </dl>
         </div>
@@ -235,9 +229,9 @@ export default function ContactPage() {
               <span>지원 유형 *</span>
               <select name="applicationType" defaultValue="" required>
                 <option value="" disabled>선택해 주세요</option>
-                <option>학부 연구생</option>
-                <option>학부 연구 인턴</option>
-                <option>기타 문의</option>
+                {undergraduateApplicationTypes.map((type) => (
+                  <option key={type}>{type}</option>
+                ))}
               </select>
             </label>
             <label className="application-field">
@@ -412,7 +406,7 @@ export default function ContactPage() {
 
       <section className="contact-details" id="contact-details">
         <span>Email directly</span>
-        <a href="mailto:yoojeong@sch.ac.kr">yoojeong@sch.ac.kr <span aria-hidden="true">↗</span></a>
+        <a href={`mailto:${siteSettings.contactEmail}`}>{siteSettings.contactEmail} <span aria-hidden="true">↗</span></a>
       </section>
     </main>
   );

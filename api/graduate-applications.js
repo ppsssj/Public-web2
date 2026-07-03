@@ -1,10 +1,8 @@
-const MAX_FILE_SIZE = 3 * 1024 * 1024;
-const allowedFileTypes = {
-  pdf: "application/pdf",
-  doc: "application/msword",
-  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  hwp: "application/x-hwp",
-};
+import { graduateApplicationSettings } from "../src/data/contact.js";
+import { siteSettings } from "../src/data/site.js";
+
+const MAX_FILE_SIZE = graduateApplicationSettings.maxFileSize;
+const allowedFileTypes = graduateApplicationSettings.allowedMimeTypes;
 
 const clean = (value, max = 500) => String(value || "").trim().slice(0, max);
 
@@ -50,7 +48,7 @@ export default async function handler(request, response) {
       },
       body: JSON.stringify({
         from: process.env.RESEND_FROM_EMAIL,
-        to: [process.env.CONTACT_TO_EMAIL || "yoojeong@sch.ac.kr"],
+        to: [process.env.CONTACT_TO_EMAIL || siteSettings.contactEmail],
         reply_to: email,
         subject: `[AICS Lab 대학원 지원] ${name} · ${fileName}`,
         text: [
